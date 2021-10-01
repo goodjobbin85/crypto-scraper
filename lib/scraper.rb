@@ -4,22 +4,50 @@ require 'pry'
 
 require_relative './cryptocurrency.rb' 
 
-class Scraper 
-    def get_page 
-        link = "https://coinmarketcap.com/all/views/all/"
-        page = Nokogiri::HTML(URI.open(link)) 
-
-        rank = page.css(".cmc-table-row")[0].css(".cmc-table__cell--sort-by__rank").text
-        name = page.css(".cmc-table-row")[0].css(".cmc-table__cell--sort-by__name").text
-        price = page.css(".cmc-table-row")[0].css(".cmc-table__cell--sort-by__price").text 
-        volume = page.css(".cmc-table-row")[0].css(".cmc-table__cell--sort-by__volume-24-h").text
-        percent_change_1_hr = page.css(".cmc-table-row")[0].css(".cmc-table__cell--sort-by__percent-change-1-h").text
-        percent_change_24_hr = page.css(".cmc-table-row")[0].css(".cmc-table__cell--sort-by__percent-change-24-h").text
-        percent_change_7_d = page.css(".cmc-table-row")[0].css(".cmc-table__cell--sort-by__percent-change-7-d").text
-
-        binding.pry 
-
-    end 
+class PageFormatError < StandardError
 end 
 
-Scraper.new.get_page
+class ParseError < StandardError
+end 
+
+class Scraper
+    attr_accessor :url, :page, :coin_list
+
+    def initialize(url = "https://coinmarketcap.com/all/views/all/")
+        @url = url
+        @page = Nokogiri::HTML(URI.open(url)) 
+        @coin_list = [] 
+        get_coins
+    end
+
+    private 
+
+    def get_coins 
+        @page.css(".cmc-table-row").each do |coin|
+            coin_list << Cryptocurrency.new(parse(coin))
+        end 
+    end 
+
+    def validate_value(str) 
+        str.empty? ? "No value" : str
+    end 
+
+    def parse(nokogiri_coin) 
+        coin = {}
+        coin[:rank] = validate_value(nokogiri_coin.css(".cmc-table__cell--sort-by__rank").text)
+        coin[:name] = nokogiri_coin.css(".cmc-table__cell--sort-by__name").text 
+        coin[:price] = nokogiri_coin.css(".cmc-table__cell--sort-by__price").text 
+        coin[:volume] = nokogiri_coin.css(".cmc-table__cell--sort-by__volume-24-h").text 
+        coin[:percent_change_1_hr] = nokogiri_coin.css(".cmc-table__cell--sort-by__percent-change-1-h").text  
+        coin[:percent_change_24_hr] = nokogiri_coin.css(".cmc-table__cell--sort-by__percent-change-24-h").text 
+        coin[:percent_change_7_d] = nokogiri_coin.css(".cmc-table__cell--sort-by__percent-change-7-d").text 
+        coin
+    end 
+    
+end 
+
+
+scraper = Scraper.new
+puts scraper.coin_list
+puts Cryptocurrency.all.count 
+Cryptocurrency.print_list
