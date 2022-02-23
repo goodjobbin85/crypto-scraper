@@ -2,13 +2,7 @@ require 'nokogiri'
 require 'open-uri' 
 require 'pry' 
 
-require_relative './cryptocurrency.rb' 
-
-class PageFormatError < StandardError
-end 
-
-class ParseError < StandardError
-end 
+require_relative './cryptocurrency.rb'  
 
 class Scraper
     attr_accessor :url, :page, :coin_list
@@ -17,15 +11,18 @@ class Scraper
         @url = url
         @page = Nokogiri::HTML(URI.open(url)) 
         @coin_list = [] 
-        get_coins
+        get_coins    
+        
     end
 
     private 
 
     def get_coins 
-        @page.css(".cmc-table-row").each do |coin|
-            coin_list << Cryptocurrency.new(parse(coin))
+        @page.css(style="display:table-row").each do |coin|
+            coin_list << Cryptocurrency.new(parse(coin)) 
         end 
+        coin_list
+
     end 
 
     def validate_value(str) 
@@ -34,7 +31,7 @@ class Scraper
 
     def parse(nokogiri_coin) 
         coin = {}
-        coin[:rank] = validate_value(nokogiri_coin.css(".cmc-table__cell--sort-by__rank").text)
+        coin[:rank] = nokogiri_coin.css(".cmc-table__cell--sort-by__rank").text
         coin[:name] = nokogiri_coin.css(".cmc-table__cell--sort-by__name").text 
         coin[:price] = nokogiri_coin.css(".cmc-table__cell--sort-by__price").text 
         coin[:volume] = nokogiri_coin.css(".cmc-table__cell--sort-by__volume-24-h").text 
@@ -47,7 +44,6 @@ class Scraper
 end 
 
 
-scraper = Scraper.new
-puts scraper.coin_list
-puts Cryptocurrency.all.count 
-Cryptocurrency.print_list
+scraper = Scraper.new 
+scraper.get_coins.first 
+

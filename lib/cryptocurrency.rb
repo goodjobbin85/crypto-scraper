@@ -1,4 +1,4 @@
-require 'nokogiri' 
+require 'pry'
 
 class Cryptocurrency 
     attr_accessor :rank, :name, :price, :volume, :percent_change_1_hr, 
@@ -35,5 +35,3 @@ class Cryptocurrency
     end 
 end 
 
-class PageFormatError < StandardError
-end
