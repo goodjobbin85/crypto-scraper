@@ -1,0 +1,9 @@
+#!usr/bin/env ruby 
+
+require_relative '../config/environment.rb' 
+
+scraper = Scraper.new 
+Cryptocurrency.print_list 
+Cryptocurrency.all.size  
+#Cryptocurrency.list_coin_names_by_rank
+

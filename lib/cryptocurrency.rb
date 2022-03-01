@@ -6,16 +6,8 @@ class Cryptocurrency
 
     @@all = []
 
-    def initialize(coin) 
-            @rank = coin[:rank]
-            @name = coin[:name]
-            @price = coin[:price]
-            @volume = coin[:volume]
-            @percent_change_1_hr = coin[:percent_change_1_hr]
-            @percent_change_24_hr = coin[:percent_change_24_hr]
-            @percent_change_7_d = coin[:percent_change_7_d] 
-
-            @@all << self
+    def initialize 
+        @@all << self
     end 
 
     def self.all 
@@ -31,6 +23,12 @@ class Cryptocurrency
             puts "1 Hour % Change: #{coin.percent_change_1_hr}" 
             puts "24 Hour % Change: #{coin.percent_change_24_hr}" 
             puts "7 Day % Change: #{coin.percent_change_7_d}"
+        end 
+    end 
+
+    def self.list_coin_names_by_rank 
+        Cryptocurrency.all.each do |coin| 
+            puts "#{coin.rank}: #{coin.name}" 
         end 
     end 
 end 
